@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini URL Shortener</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1rem;
+    }
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    input[type="text"], input[type="url"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, input[type="url"]:focus {
+      border-color: var(--accent);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    button.btn-primary {
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    button.btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    button.btn-primary:active {
+      transform: scale(0.98);
+    }
+    .alert {
+      padding: 0.85rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.925rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .alert-success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--success);
+      color: #6ee7b7;
+    }
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--danger);
+      color: #fca5a5;
+    }
+    .copy-btn {
+      background: #334155;
+      color: #f8fafc;
+      border: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+    .copy-btn:hover { background: #475569; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: #151e2e;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--card-border);
+    }
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #1e293b;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    .code-badge {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      font-family: monospace;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .code-badge:hover { text-decoration: underline; }
+    .original-url-cell {
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .original-url-cell a {
+      color: #cbd5e1;
+      text-decoration: none;
+    }
+    .original-url-cell a:hover { color: #818cf8; }
+    .badge-clicks {
+      background: #334155;
+      color: #f1f5f9;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+    }
+    footer {
+      margin-top: 2rem;
+      color: #64748b;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    #redirectMessage {
+      display: none;
+      text-align: center;
+      padding: 3rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="redirectMessage">
+      <h2 style="margin-bottom: 1rem; color: #818cf8;">Redirecting...</h2>
+      <p id="redirectText" style="color: var(--text-muted);"></p>
+    </div>
+
+    <div id="mainContent">
+      <header>
+        <h1>Mini URL Shortener</h1>
+        <p>Fast, persistent short links with real-time click tracking</p>
+      </header>
+
+      <div id="alertBox"></div>
+
+      <div class="card">
+        <form id="shortenForm">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="url">Original Long URL *</label>
+              <input type="text" id="url" placeholder="https://example.com/very/long/path" required />
+            </div>
+            <div class="form-group">
+              <label for="alias">Custom Alias (Optional)</label>
+              <input type="text" id="alias" placeholder="e.g. my-link" />
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Shorten URL</button>
+        </form>
+      </div>
+
+      <div class="card" style="padding: 0; overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Short Link</th>
+              <th>Original Destination</th>
+              <th>Clicks</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="urlsTableBody">
+            <tr>
+              <td colspan="4" style="text-align: center; color: #64748b; padding: 2rem;">No URLs shortened yet. Create one above!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer>
+        Mini URL Shortener &bull; GitHub Pages &amp; CLI Compatible
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Local storage key
+    const STORAGE_KEY = 'mini_shortener_urls';
+
+    function getStoredUrls() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveStoredUrls(urls) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(urls));
+    }
+
+    function generateCode(len = 6) {
+      const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      let res = '';
+      for (let i = 0; i < len; i++) {
+        res += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return res;
+    }
+
+    function renderTable() {
+      const urls = getStoredUrls();
+      const tbody = document.getElementById('urlsTableBody');
+      if (!urls || urls.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748b; padding: 2rem;">No URLs shortened yet. Create one above!</td></tr>';
+        return;
+      }
+      tbody.innerHTML = urls.map(item => {
+        const fullShortUrl = window.location.origin + window.location.pathname + '#' + item.code;
+        return `
+          <tr>
+            <td><a href="${fullShortUrl}" target="_blank" class="code-badge">#${item.code}</a></td>
+            <td class="original-url-cell"><a href="${item.originalUrl}" target="_blank" title="${item.originalUrl}">${item.originalUrl}</a></td>
+            <td><span class="badge-clicks">${item.clicks || 0}</span></td>
+            <td style="color: #94a3b8; font-size: 0.8rem;">${(item.createdAt || '').slice(0, 10)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function checkRedirect() {
+      const hash = window.location.hash.replace(/^#/, '').trim();
+      const params = new URLSearchParams(window.location.search);
+      const code = hash || params.get('r');
+
+      if (code) {
+        const urls = getStoredUrls();
+        const found = urls.find(u => u.code === code);
+        if (found) {
+          found.clicks = (found.clicks || 0) + 1;
+          saveStoredUrls(urls);
+
+          document.getElementById('mainContent').style.display = 'none';
+          const rMsg = document.getElementById('redirectMessage');
+          rMsg.style.display = 'block';
+          document.getElementById('redirectText').innerHTML = `Redirecting to <strong>${found.originalUrl}</strong> in 1 second...`;
+          setTimeout(() => {
+            window.location.href = found.originalUrl;
+          }, 1000);
+          return true;
+        }
+      }
+      return false;
+    }
+
+    document.getElementById('shortenForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let inputUrl = document.getElementById('url').value.trim();
+      let alias = document.getElementById('alias').value.trim();
+      const alertBox = document.getElementById('alertBox');
+
+      if (!inputUrl) return;
+      if (!/^https?:\/\//i.test(inputUrl)) {
+        inputUrl = 'https://' + inputUrl;
+      }
+
+      const urls = getStoredUrls();
+      let code = alias;
+
+      if (alias) {
+        if (alias.length < 2) {
+          alertBox.innerHTML = '<div class="alert alert-danger">Alias must be at least 2 characters long.</div>';
+          return;
+        }
+        if (urls.some(u => u.code.toLowerCase() === alias.toLowerCase())) {
+          alertBox.innerHTML = `<div class="alert alert-danger">Alias '${alias}' is already in use. Please choose another.</div>`;
+          return;
+        }
+      } else {
+        const existing = urls.find(u => u.originalUrl === inputUrl);
+        if (existing) {
+          code = existing.code;
+        } else {
+          do {
+            code = generateCode();
+          } while (urls.some(u => u.code === code));
+        }
+      }
+
+      if (!urls.some(u => u.code === code)) {
+        urls.unshift({
+          code: code,
+          originalUrl: inputUrl,
+          createdAt: new Date().toISOString(),
+          clicks: 0
+        });
+        saveStoredUrls(urls);
+      }
+
+      const fullShortUrl = window.location.origin + window.location.pathname + '#' + code;
+      alertBox.innerHTML = `
+        <div class="alert alert-success">
+          <div>
+            <strong>Shortened Link:</strong>
+            <a href="${fullShortUrl}" target="_blank" style="color: #6ee7b7; font-weight: 600; margin-left: 0.5rem;">${fullShortUrl}</a>
+          </div>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText('${fullShortUrl}'); this.textContent='Copied!';">Copy</button>
+        </div>
+      `;
+
+      document.getElementById('url').value = '';
+      document.getElementById('alias').value = '';
+      renderTable();
+    });
+
+    // Run on page load
+    if (!checkRedirect()) {
+      renderTable();
+    }
+  </script>
+</body>
+</html>
