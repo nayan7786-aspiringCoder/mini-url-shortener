@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database
+urls.db
+*.db
+
+# Temporary exports
+urls_export_*.json
+urls_export_*.csv
+export.json
+export.csv
