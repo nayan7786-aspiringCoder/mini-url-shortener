@@ -1,20 +1,24 @@
-# Mini URL Shortener (CLI)
+# Mini URL Shortener (CLI & Flask Web App)
 
-A robust, lightweight, and zero-dependency Command Line URL Shortener built with **Python 3 Standard Library**.
-
-This project fulfills all requirements for **Track A: 1st Year (CLI-based)**, including bonus features and creative additions for analytics, interactive execution, and browser integration.
+A robust, full-featured URL Shortener built in Python supporting both **Track A: 1st Year (CLI-based)** and **Track B: 2nd Year (Flask Web App)** with persistent SQLite storage, analytics, custom aliases, and zero-dependency core CLI.
 
 ---
 
 ## Features
 
-### Core Requirements
+### Track A: CLI Core Requirements
 - **URL Shortening (`shorten`)**: Generates clean, unique Base62 short codes (e.g., `PeeF3m`) for valid web URLs.
 - **Persistent Storage**: Uses Python's built-in `sqlite3` database (`urls.db`). URL mappings persist across application and terminal sessions.
 - **URL Resolution (`resolve`)**: Looks up short codes and returns original destination URLs.
 - **Listing (`list`)**: Displays all shortened URLs in a formatted, aligned ASCII table.
 - **Input Validation & Error Handling**: Strict URL format checking, invalid protocol rejection, and graceful handling of missing or duplicate codes.
-- **Zero External Dependencies**: Implemented entirely with the Python Standard Library (`sqlite3`, `argparse`, `urllib`, `webbrowser`, `secrets`, `json`, `csv`, `unittest`).
+- **Zero External Dependencies for CLI**: Implemented entirely with the Python Standard Library (`sqlite3`, `argparse`, `urllib`, `webbrowser`, `secrets`, `json`, `csv`, `unittest`).
+
+### Track B: Flask Web Application & Deployment
+- **Interactive Modern UI**: Beautiful responsive web interface at `http://localhost:5000` (`templates/index.html`).
+- **HTTP 302 Redirection**: Accessing `http://localhost:5000/<short_code>` immediately redirects to the original destination.
+- **RESTful API**: Endpoints for `/api/shorten`, `/api/stats/<short_code>`, and `/api/urls`.
+- **Cloud Deployment Ready**: Includes `requirements.txt` and `Procfile` ready for free 1-click deployment on Render, Railway, or PythonAnywhere.
 
 ### Bonus Features (Included)
 - **Custom Alias Support (`--alias`)**: Create user-defined aliases (e.g., `shorten https://github.com --alias gh`). Checks for length, character validity, and prevents collision with existing codes.
@@ -26,7 +30,7 @@ This project fulfills all requirements for **Track A: 1st Year (CLI-based)**, in
 - **Interactive REPL Shell (`interactive`)**: Run commands continuously in an interactive prompt (`shortener>`) without restarting the CLI.
 - **Data Export (`export`)**: Export your URL registry into structured JSON or CSV format.
 - **Record Deletion (`delete`)**: Easily remove outdated or temporary short codes from storage.
-- **Automated Test Suite**: 100% standard library `unittest` suite covering unit logic, validation, edge cases, and cross-session persistence.
+- **Automated Test Suite**: 13 unit tests covering unit logic, validation, edge cases, cross-session persistence, and web routes.
 
 ---
 
@@ -35,9 +39,15 @@ This project fulfills all requirements for **Track A: 1st Year (CLI-based)**, in
 ```
 mini-url-shortener/
 ├── main.py              # CLI entry point, argument parsing & interactive REPL
+├── app.py               # Flask Web Application & HTTP 302 Redirect Server
+├── templates/
+│   └── index.html       # Responsive web interface
 ├── shortener.py         # Business logic: validation, Base62 generator, alias rules
 ├── storage.py           # SQLite database persistence layer (urls.db)
-├── test_shortener.py    # Automated test suite using unittest
+├── test_shortener.py    # CLI automated test suite using unittest
+├── test_app.py          # Flask web app test suite
+├── requirements.txt     # Dependencies for optional web app deployment
+├── Procfile             # Process file for Render / Railway cloud hosting
 ├── urls.db              # SQLite database (auto-generated on first run)
 ├── .gitignore           # Git ignore file
 └── README.md            # Project documentation and usage guide
